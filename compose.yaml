@@ -1,0 +1,13 @@
+services:
+  web:
+    build: .
+    ports: ["8000:8000"]
+    environment:
+      DJANGO_DEBUG: "${DJANGO_DEBUG:-1}"
+      DJANGO_SECRET_KEY: "${DJANGO_SECRET_KEY:-dealerflow-local-development-key}"
+      DJANGO_ALLOWED_HOSTS: "${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1}"
+      DEALERFLOW_DB_PATH: /app/data/db.sqlite3
+    volumes:
+      - dealerflow_data:/app/data
+volumes:
+  dealerflow_data:
