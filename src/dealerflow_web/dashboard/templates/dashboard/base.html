@@ -1,0 +1,11 @@
+{% load static %}
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{% block title %}DealerFlow{% endblock %}</title>
+<link rel="stylesheet" href="{% static 'dashboard/app.css' %}">
+{% block extra_head %}{% endblock %}
+</head><body>
+<header class="site-header"><a class="brand" href="{% url 'dashboard:index' %}"><span class="brand-mark">DF</span><span><strong>DealerFlow</strong><small>automotive distribution simulator</small></span></a><nav><a href="{% url 'dashboard:index' %}">Runs</a><a href="/admin/">Admin</a></nav></header>
+<main class="page-shell">{% block content %}{% endblock %}</main>
+{% block extra_scripts %}{% endblock %}
+</body></html>
