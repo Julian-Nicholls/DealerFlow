@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=75", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dealerflow"
+version = "0.1.0"
+description = "Synthetic automotive import, distribution, allocation, and operations-planning simulator"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+  "pydantic>=2.9,<3",
+  "PyYAML>=6.0,<7",
+  "simpy>=4.1,<5",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.3,<9"]
+
+[project.scripts]
+dealerflow = "dealerflow.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
