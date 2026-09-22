@@ -1,0 +1,11 @@
+{% extends "dashboard/base.html" %}
+{% block title %}DealerFlow · Simulation Runs{% endblock %}
+{% block content %}
+<section class="hero"><div><p class="eyebrow">Canadian EV operations planning</p><h1>Demand → allocation → logistics → dealer.</h1><p class="hero-copy">Run a deterministic synthetic quota year, persist every operational event, and replay the network through time.</p></div>
+<form method="post" action="{% url 'dashboard:create-baseline-run' %}">{% csrf_token %}<button class="primary-button" type="submit">Run baseline year</button><p class="form-note">Runs synchronously for now. Same seed, same world.</p></form></section>
+<section class="section-heading"><div><p class="eyebrow">History</p><h2>Simulation runs</h2></div></section>
+<div class="table-card"><table><thead><tr><th>Run</th><th>Scenario</th><th>Status</th><th>Events</th><th>Fill rate</th><th>Created</th></tr></thead><tbody>
+{% for run in runs %}<tr><td><a href="{% url 'dashboard:run-detail' run.pk %}">#{{ run.pk }}</a></td><td>{{ run.scenario.name }}</td><td><span class="status status-{{ run.status|lower }}">{{ run.get_status_display }}</span></td><td>{{ run.event_count }}</td><td>{% if run.summary.fill_rate != None %}{{ run.summary.fill_rate|floatformat:3 }}{% else %}—{% endif %}</td><td>{{ run.created_at|date:"Y-m-d H:i" }}</td></tr>
+{% empty %}<tr><td colspan="6" class="empty-state">No persisted runs yet. Fire the baseline.</td></tr>{% endfor %}
+</tbody></table></div>
+{% endblock %}
