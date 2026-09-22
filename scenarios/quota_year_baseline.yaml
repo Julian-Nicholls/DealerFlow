@@ -1,0 +1,60 @@
+name: quota-year-baseline
+start_date: 2026-03-01
+end_date: 2027-03-01
+seed: 4172
+warm_start_weeks: 6
+
+quota:
+  enabled: true
+  national_limit: 49000
+  initial_external_usage: 0
+  external_daily_mean: 105.0
+
+planning:
+  dealer_replenishment_cycle_days: 7
+  china_order_cycle_days: 28
+  allocation_cycle_days: 1
+
+logistics:
+  production_days: [21, 35, 49]
+  export_staging_days: [3, 7, 14]
+  ocean_days: [15, 20, 30]
+  port_dwell_days: [2, 5, 12]
+  rail_days: [7, 10, 18]
+  truck_days: [1, 3, 7]
+  batch_capacity: 600
+
+dealers:
+  - {id: YVR-01, name: Pacific Metro Motors, city: Vancouver, province: "BC", latitude: 49.2827, longitude: -123.1207, demand_scale: 1.20, target_weeks_of_supply: 6}
+  - {id: YYC-01, name: Prairie EV Calgary, city: Calgary, province: "AB", latitude: 51.0447, longitude: -114.0719, demand_scale: 0.85, target_weeks_of_supply: 6}
+  - {id: YEG-01, name: North Prairie Auto, city: Edmonton, province: "AB", latitude: 53.5461, longitude: -113.4938, demand_scale: 0.72, target_weeks_of_supply: 6}
+  - {id: YXE-01, name: Bridge City Electric, city: Saskatoon, province: "SK", latitude: 52.1332, longitude: -106.6700, demand_scale: 0.42, target_weeks_of_supply: 6}
+  - {id: YWG-01, name: Red River EV, city: Winnipeg, province: "MB", latitude: 49.8951, longitude: -97.1384, demand_scale: 0.60, target_weeks_of_supply: 6}
+  - {id: YYZ-01, name: Lakeshore Electric Toronto, city: Toronto, province: "ON", latitude: 43.6532, longitude: -79.3832, demand_scale: 1.55, target_weeks_of_supply: 7}
+  - {id: YYZ-02, name: North GTA Auto, city: Vaughan, province: "ON", latitude: 43.8561, longitude: -79.5085, demand_scale: 1.15, target_weeks_of_supply: 7}
+  - {id: YYZ-03, name: East GTA Electric, city: Markham, province: "ON", latitude: 43.8561, longitude: -79.3370, demand_scale: 1.08, target_weeks_of_supply: 7}
+  - {id: YHM-01, name: Harbour EV Hamilton, city: Hamilton, province: "ON", latitude: 43.2557, longitude: -79.8711, demand_scale: 0.88, target_weeks_of_supply: 6}
+  - {id: YXU-01, name: Forest City Motors, city: London, province: "ON", latitude: 42.9849, longitude: -81.2453, demand_scale: 0.68, target_weeks_of_supply: 6}
+  - {id: YOW-01, name: Capital Electric Auto, city: Ottawa, province: "ON", latitude: 45.4215, longitude: -75.6972, demand_scale: 0.92, target_weeks_of_supply: 6}
+  - {id: YUL-01, name: Montreal Electrique, city: Montreal, province: "QC", latitude: 45.5019, longitude: -73.5674, demand_scale: 1.28, target_weeks_of_supply: 7}
+  - {id: YUL-02, name: Rive-Sud EV, city: Longueuil, province: "QC", latitude: 45.5312, longitude: -73.5181, demand_scale: 0.78, target_weeks_of_supply: 6}
+  - {id: YQB-01, name: Capitale-Nationale Auto, city: Quebec City, province: "QC", latitude: 46.8139, longitude: -71.2080, demand_scale: 0.63, target_weeks_of_supply: 6}
+  - {id: YHZ-01, name: Atlantic Electric Motors, city: Halifax, province: "NS", latitude: 44.6488, longitude: -63.5752, demand_scale: 0.48, target_weeks_of_supply: 6}
+
+vehicle_configurations:
+  - {id: DF-SEAL-DM-RWD-WHT, model: Seal, trim: Dynamic RWD, exterior_colour: White, interior_colour: Black, daily_demand_weight: 0.085}
+  - {id: DF-SEAL-PR-AWD-BLU, model: Seal, trim: Premium AWD, exterior_colour: Blue, interior_colour: Black, daily_demand_weight: 0.055}
+  - {id: DF-ATTO3-CM-WHT, model: Atto 3, trim: Comfort, exterior_colour: White, interior_colour: Black, daily_demand_weight: 0.105}
+  - {id: DF-ATTO3-DM-GRY, model: Atto 3, trim: Design, exterior_colour: Grey, interior_colour: Black, daily_demand_weight: 0.075}
+  - {id: DF-DOLPHIN-CM-WHT, model: Dolphin, trim: Comfort, exterior_colour: White, interior_colour: Black, daily_demand_weight: 0.095}
+  - {id: DF-DOLPHIN-DM-BLU, model: Dolphin, trim: Design, exterior_colour: Blue, interior_colour: Black, daily_demand_weight: 0.060}
+
+disturbances:
+  - type: demand_spike
+    start_day: 136
+    duration_days: 35
+    province: "ON"
+    multiplier: 1.45
+  - type: vessel_delay
+    shipment_number: 3
+    delay_days: 11
