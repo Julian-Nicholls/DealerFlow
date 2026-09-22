@@ -6,49 +6,57 @@ Its purpose is to turn dealer demand into an auditable chain of planning and log
 
 The project is inspired by the work described in BYD Canada's public Operations Planning Specialist posting. It does **not** claim access to BYD proprietary data, dealer networks, systems, allocation rules, or logistics contracts.
 
-## Current milestone
-
-The first milestone is the simulation kernel, not the web UI.
-
-A scenario is defined in YAML, validated with Pydantic, executed as a deterministic discrete-event simulation with SimPy, and emitted as an immutable event log. The future animated map will replay that completed event stream rather than drive the simulation itself.
+## Architecture
 
 ```text
 Scenario YAML
-    |
-    v
+    ↓
 Pydantic validation
-    |
-    v
+    ↓
 SimPy simulation kernel
-    |
-    +--> Event log
-    +--> KPI summary
-    |
-    +--> Animated map replay   (next)
-    +--> Planning analytics    (next)
+    ↓
+immutable event log + KPIs
+    ↓
+Django persistence (SQLite)
+    ↓
+run browser / replay / analytics
 ```
 
-## Implemented in the kernel
+The simulation package remains framework-independent. Django orchestrates runs, persists outputs, and presents them.
 
-- 365-day Canadian quota-year scenario
-- 15 synthetic Canadian dealers, weighted toward Ontario
-- synthetic model / trim / colour configurations
-- deterministic independent random streams
-- stochastic retail demand
-- configurable demand and logistics disturbances
-- dealer replenishment orders
-- recurring China-order recommendations
-- production lead times
-- individual 17-character synthetic VIN creation
-- inbound VIN allocation to dealer demand
-- warm-start inventory and an already-at-sea shipment
-- Ro-Ro shipment events into Vancouver
-- port dwell, rail, and final truck delivery stages
-- national China-origin EV quota consumption, including stochastic external use
-- immutable event history and reproducibility digest
-- end-of-run service, inventory, quota, and backlog summary
+## Current capabilities
 
-## Quick start
+- 365-day Canadian quota-year simulation
+- 15 synthetic Canadian dealers, Ontario-heavy
+- stochastic demand and configurable disturbances
+- dealer replenishment and recurring China-order recommendations
+- synthetic VIN creation and inbound allocation
+- Ro-Ro / port / rail / truck logistics events
+- shared national EV quota pressure
+- deterministic independent RNG streams
+- persisted simulation runs and event histories
+- Django run history and KPI view
+- time-scrubbable event replay
+- SQLite persistence
+- Docker/Compose deployment
+
+## Run with Docker
+
+```bash
+docker compose up --build
+```
+
+Then open:
+
+```text
+http://localhost:8000
+```
+
+Press **Run baseline year** to execute and persist the canonical scenario.
+
+SQLite lives in the named `dealerflow_data` Docker volume.
+
+## Run without Docker
 
 Requires Python 3.12+.
 
@@ -57,30 +65,37 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -e '.[dev]'
 
-dealerflow scenarios/quota_year_baseline.yaml
-dealerflow scenarios/quota_year_baseline.yaml --events outputs/baseline.jsonl
-
-pytest
+python manage.py migrate
+python manage.py runserver
 ```
 
-The CLI prints an event-log digest. Two runs of the same scenario and seed should produce the same digest, which is important for fair policy comparisons.
+The framework-independent CLI still works:
 
-## Scenario design
+```bash
+dealerflow scenarios/quota_year_baseline.yaml
+```
 
-Human-authored scenarios use YAML. Pydantic models are the canonical schema, which will later let a GUI scenario editor target the same underlying definition.
+## Cloudflare Tunnel target
 
-The baseline scenario includes two example disturbances:
+The intended public-demo shape is:
 
-- an Ontario demand spike during the summer
-- an 11-day delay to the third simulated ocean shipment
+```text
+Cloudflare Tunnel
+      ↓
+host :8000
+      ↓
+Docker / Gunicorn / Django
+      ↓
+SQLite volume
+```
 
-Disturbances are scenario data, not hard-coded special cases.
+For a public hostname, configure `DJANGO_ALLOWED_HOSTS`, `DJANGO_CSRF_TRUSTED_ORIGINS`, a real `DJANGO_SECRET_KEY`, and disable debug mode.
 
-## Why individual VINs?
+## Why SQLite?
 
-Demand planning begins in quantities, but allocation eventually becomes physical. DealerFlow creates individual vehicles once production completes and can allocate a specific inbound VIN to a dealer while that vehicle is still moving through the logistics pipeline.
+This is a low-concurrency portfolio application with tens of thousands of rows per simulation run, not an OLTP system. SQLite minimizes operational overhead and is more than adequate at this scale.
 
-Physical state and allocation state are deliberately separate. A VIN can be simultaneously `OCEAN` and `ALLOCATED`.
+The persistence layer remains conventional Django ORM, so PostgreSQL can be introduced later without touching the simulation kernel.
 
 ## Documentation
 
@@ -89,4 +104,10 @@ Physical state and allocation state are deliberately separate. A VIN can be simu
 
 ## Next
 
-The next milestone is the replay/analytics layer: persisted run outputs, a Canada map with time controls, shipment inspection, dealer inventory/backlog pressure, and scenario/policy comparison.
+- animated geographic replay
+- planning/allocation policy comparison
+- scenario editor
+- VIN/allocation workbench
+- calibrated Canadian EV demand inputs
+- reconciliation/error injection
+- CSV/Excel outputs
