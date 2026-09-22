@@ -1,0 +1,31 @@
+{% extends "dashboard/base.html" %}{% load static %}
+{% block title %}DealerFlow · Run #{{ run.pk }}{% endblock %}
+{% block extra_head %}<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">{% endblock %}
+{% block content %}
+<section class="run-header"><div><p class="eyebrow">{{ run.scenario.name }}</p><h1>Run #{{ run.pk }}</h1><p class="mono subtle">seed {{ run.seed }} · {{ run.start_date }} → {{ run.end_date }} · {{ run.event_count }} events</p></div><span class="status status-{{ run.status|lower }}">{{ run.get_status_display }}</span></section>
+{% if run.status == "COMPLETE" %}
+<section class="kpi-grid">
+<article><span>Demand</span><strong>{{ run.summary.demand_units }}</strong><small>units</small></article>
+<article><span>Sales fulfilled</span><strong>{{ run.summary.sales_units }}</strong><small>units</small></article>
+<article><span>Fill rate</span><strong>{{ run.summary.fill_rate|floatformat:3 }}</strong><small>share</small></article>
+<article><span>Ending backlog</span><strong>{{ run.summary.ending_backlog_units }}</strong><small>units</small></article>
+<article><span>DealerFlow quota</span><strong>{{ run.summary.dealerflow_quota_used }}</strong><small>units</small></article>
+<article><span>External quota</span><strong>{{ run.summary.external_quota_used }}</strong><small>units</small></article>
+</section>
+<section id="replay-root" class="replay-card" data-api-url="{% url 'dashboard:run-replay-api' run.pk %}">
+<div class="replay-toolbar"><div><p class="eyebrow">Network replay</p><h2 id="replay-date">Loading…</h2></div><div class="controls"><button type="button" id="play-button" disabled>Play</button><label>Speed <select id="speed-select" disabled><option value="7">7 days/s</option><option value="30" selected>30 days/s</option><option value="90">90 days/s</option></select></label></div></div>
+<input id="day-slider" class="timeline" type="range" min="0" max="365" value="0" step="0.1" disabled>
+<div class="replay-layout"><div id="map" class="map" aria-label="DealerFlow simulation map"></div><aside class="replay-sidebar">
+<div class="live-stat"><span>Simulation day</span><strong id="day-value">0.0</strong></div>
+<div class="live-stat"><span>Active vehicles in motion</span><strong id="active-movements">0</strong></div>
+<div class="live-stat"><span>Network backlog</span><strong id="network-backlog">0</strong></div>
+<div class="live-stat"><span>External quota used</span><strong id="quota-used">0</strong></div>
+<div class="event-feed"><h3>Operational markers</h3><div id="event-list"><p class="subtle">Loading replay data…</p></div></div>
+</aside></div>
+<p class="map-note">Dealer/facility locations are synthetic scenario data. Routes are schematic straight-line replay paths, not claimed carrier routings.</p>
+</section>
+<section class="digest-card"><span>Deterministic event digest</span><code>{{ run.event_digest }}</code></section>
+{% elif run.status == "FAILED" %}<section class="error-card"><h2>Simulation failed</h2><pre>{{ run.error }}</pre></section>
+{% else %}<section class="table-card"><p>Simulation is still running.</p></section>{% endif %}
+{% endblock %}
+{% block extra_scripts %}{% if run.status == "COMPLETE" %}<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script><script src="{% static 'dashboard/replay.js' %}" defer></script>{% endif %}{% endblock %}
