@@ -4,6 +4,18 @@ end_date: 2027-03-01
 seed: 4172
 warm_start_weeks: 6
 
+facilities:
+  - {id: CHINA_FACTORY, name: Synthetic China Factory, kind: FACTORY, latitude: 22.70, longitude: 114.00}
+  - {id: CHINA_EXPORT_PORT, name: Synthetic South China Export Port, kind: EXPORT_PORT, latitude: 22.58, longitude: 114.27}
+  - {id: VANCOUVER, name: Vancouver Import Gateway, kind: IMPORT_PORT, latitude: 49.13, longitude: -123.08}
+  - {id: BC_COMPOUND, name: BC Regional Compound, kind: REGIONAL_COMPOUND, latitude: 49.18, longitude: -122.96}
+  - {id: AB_COMPOUND, name: Alberta Regional Compound, kind: REGIONAL_COMPOUND, latitude: 51.05, longitude: -114.07}
+  - {id: SK_COMPOUND, name: Saskatchewan Regional Compound, kind: REGIONAL_COMPOUND, latitude: 52.13, longitude: -106.67}
+  - {id: MB_COMPOUND, name: Manitoba Regional Compound, kind: REGIONAL_COMPOUND, latitude: 49.90, longitude: -97.14}
+  - {id: ON_COMPOUND, name: Ontario Regional Compound, kind: REGIONAL_COMPOUND, latitude: 43.68, longitude: -79.63}
+  - {id: QC_COMPOUND, name: Quebec Regional Compound, kind: REGIONAL_COMPOUND, latitude: 45.50, longitude: -73.57}
+  - {id: NS_COMPOUND, name: Atlantic Regional Compound, kind: REGIONAL_COMPOUND, latitude: 44.65, longitude: -63.58}
+
 quota:
   enabled: true
   national_limit: 49000
