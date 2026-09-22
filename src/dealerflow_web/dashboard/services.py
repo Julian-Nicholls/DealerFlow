@@ -35,7 +35,7 @@ def build_replay_payload(run:SimulationRun)->dict:
         locations[d.id]={"id":d.id,"name":d.name,"kind":"DEALER","city":d.city,"province":d.province,"latitude":d.latitude,"longitude":d.longitude}
 
     events=list(run.events.order_by("sequence").values("simulation_day","event_type","entity_id","location_id","payload"))
-    ocean={}; rail={}; truck={}; movements=[]; pressure=[]; markers=[]; quota=[]
+    ocean={}; rail={}; truck={}; movements=[]; pressure=[]; markers=[]; quota=[]; sales=[]
     marker_types={"CHINA_ORDER_RECOMMENDED","VESSEL_ARRIVED","DISTURBANCE_STARTED","DISTURBANCE_ENDED","DISTURBANCE_APPLIED","QUOTA_BLOCKED"}
     for e in events:
         day=float(e["simulation_day"]); typ=e["event_type"]; eid=e["entity_id"]; p=e["payload"] or {}
@@ -53,6 +53,7 @@ def build_replay_payload(run:SimulationRun)->dict:
         elif typ=="BACKLOG_CREATED": pressure.append({"day":day,"dealer_id":eid,"delta":1})
         elif typ=="BACKLOG_FULFILLED": pressure.append({"day":day,"dealer_id":e["location_id"],"delta":-1})
         elif typ=="EXTERNAL_QUOTA_CONSUMED": quota.append({"day":day,"external_usage":int(p.get("external_usage",0))})
+        elif typ=="RETAIL_SALE_COMPLETED": sales.append({"day":day,"dealer_id":p.get("dealer_id") or e["location_id"],"vin":eid,"configuration_id":p.get("configuration_id")})
         if typ in marker_types: markers.append({"day":day,"type":typ,"entity_id":eid,"location_id":e["location_id"],"payload":p})
 
     # Aggregate domestic VIN movements into day/origin/destination batches for browser replay.
@@ -65,4 +66,4 @@ def build_replay_payload(run:SimulationRun)->dict:
     for i,g in enumerate(grouped.values(),1):
         c=g["count"]; out.append({"id":f"MOV-{i:05d}","mode":g["mode"],"origin_id":g["origin_id"],"destination_id":g["destination_id"],"start_day":g["start_sum"]/c,"end_day":g["end_sum"]/c,"count":c})
     out.sort(key=lambda x:x["start_day"])
-    return {"run":{"id":run.pk,"scenario":run.scenario.name,"start_date":run.start_date.isoformat(),"end_date":run.end_date.isoformat(),"duration_days":(run.end_date-run.start_date).days,"seed":run.seed,"digest":run.event_digest,"summary":run.summary},"locations":list(locations.values()),"movements":out,"pressure_events":pressure,"markers":markers,"quota_series":quota}
+    return {"run":{"id":run.pk,"scenario":run.scenario.name,"start_date":run.start_date.isoformat(),"end_date":run.end_date.isoformat(),"duration_days":(run.end_date-run.start_date).days,"seed":run.seed,"digest":run.event_digest,"summary":run.summary},"locations":list(locations.values()),"movements":out,"pressure_events":pressure,"markers":markers,"quota_series":quota,"sales":sales}
