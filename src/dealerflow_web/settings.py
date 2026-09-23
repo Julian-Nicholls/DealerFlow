@@ -1,6 +1,11 @@
 from pathlib import Path
 import os
-BASE_DIR=Path(__file__).resolve().parents[2]
+
+# DealerFlow is installed as a Python package inside Docker, so __file__ points
+# into site-packages rather than at the repository root. Anchor runtime data
+# and project assets to an explicit application directory instead.
+BASE_DIR=Path(os.environ.get("DEALERFLOW_BASE_DIR", Path.cwd())).resolve()
+
 SECRET_KEY=os.environ.get("DJANGO_SECRET_KEY","dealerflow-local-development-key")
 DEBUG=os.environ.get("DJANGO_DEBUG","1").lower() in {"1","true","yes"}
 ALLOWED_HOSTS=[x.strip() for x in os.environ.get("DJANGO_ALLOWED_HOSTS","localhost,127.0.0.1").split(",") if x.strip()]
@@ -11,11 +16,20 @@ ROOT_URLCONF="dealerflow_web.urls"
 TEMPLATES=[{"BACKEND":"django.template.backends.django.DjangoTemplates","DIRS":[],"APP_DIRS":True,"OPTIONS":{"context_processors":["django.template.context_processors.request","django.contrib.auth.context_processors.auth","django.contrib.messages.context_processors.messages"]}}]
 WSGI_APPLICATION="dealerflow_web.wsgi.application"
 ASGI_APPLICATION="dealerflow_web.asgi.application"
-db=Path(os.environ.get("DEALERFLOW_DB_PATH",BASE_DIR/"data"/"db.sqlite3")); db.parent.mkdir(parents=True,exist_ok=True)
+
+db=Path(os.environ.get("DEALERFLOW_DB_PATH",BASE_DIR/"data"/"db.sqlite3"))
+db.parent.mkdir(parents=True,exist_ok=True)
 DATABASES={"default":{"ENGINE":"django.db.backends.sqlite3","NAME":db}}
+
 AUTH_PASSWORD_VALIDATORS=[]
-LANGUAGE_CODE="en-ca"; TIME_ZONE="America/Toronto"; USE_I18N=True; USE_TZ=True
-STATIC_URL="static/"; STATIC_ROOT=BASE_DIR/"staticfiles"
+LANGUAGE_CODE="en-ca"
+TIME_ZONE="America/Toronto"
+USE_I18N=True
+USE_TZ=True
+
+STATIC_URL="static/"
+STATIC_ROOT=Path(os.environ.get("DEALERFLOW_STATIC_ROOT",BASE_DIR/"staticfiles"))
 STORAGES={"staticfiles":{"BACKEND":"whitenoise.storage.CompressedManifestStaticFilesStorage"}}
+
 DEFAULT_AUTO_FIELD="django.db.models.BigAutoField"
-DEALERFLOW_SCENARIO_DIR=BASE_DIR/"scenarios"
+DEALERFLOW_SCENARIO_DIR=Path(os.environ.get("DEALERFLOW_SCENARIO_DIR",BASE_DIR/"scenarios"))
