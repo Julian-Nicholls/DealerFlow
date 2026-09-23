@@ -340,6 +340,28 @@ def _shipment_movements(
             )
             movements.append(movement)
 
+    for shipment_id, departure in departures.items():
+        depart_payload = departure["payload"] or {}
+        mode = depart_payload.get("mode") or departure_types[departure["event_type"]]
+        origin = depart_payload.get("origin") or departure["location_id"]
+        destination = depart_payload.get("destination")
+        if not destination:
+            continue
+        movement = {
+            "id": shipment_id,
+            "entity_type": "shipment",
+            "mode": mode,
+            "origin_id": origin,
+            "destination_id": destination,
+            "start_day": float(departure["simulation_day"]),
+            "end_day": float(depart_payload.get("planned_arrival_day") or departure["simulation_day"]),
+            "count": int(depart_payload.get("vin_count", 1)),
+            "configuration_mix": depart_payload.get("configuration_mix", {}),
+            "vins": depart_payload.get("vins", []),
+        }
+        movement["route"] = _route_geometry(mode, origin, destination, locations)
+        movements.append(movement)
+
     return sorted(movements, key=lambda item: item["start_day"])
 
 
@@ -683,6 +705,7 @@ def inspect_entity(
         mix = Counter(item["configuration_id"] for item in present)
         result = {
             **location,
+            "location_kind": location.get("kind"),
             "kind": "location",
             "day": day,
             "vehicle_count": len(present),
@@ -727,20 +750,20 @@ def inspect_entity(
                 "missing": True,
                 "day": day,
             }
-        history = list(
-            run.events.filter(
-                entity_id=entity_id,
-                simulation_day__lte=day,
-            )
-            .order_by("sequence")
-            .values(
-                "simulation_day",
-                "event_type",
-                "location_id",
-                "correlation_id",
-                "payload",
-            )
-        )
+        history = []
+        for event in run.events.filter(simulation_day__lte=day).order_by("sequence").iterator(chunk_size=2000):
+            payload = event.payload or {}
+            if event.entity_id != entity_id and entity_id not in payload.get("vins", []):
+                continue
+            history.append({
+                "simulation_day": event.simulation_day,
+                "event_type": event.event_type,
+                "entity_id": event.entity_id,
+                "entity_type": event.entity_type,
+                "location_id": event.location_id,
+                "correlation_id": event.correlation_id,
+                "payload": payload,
+            })
         return {
             "kind": "vin",
             "day": day,
