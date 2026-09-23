@@ -228,7 +228,7 @@
     }
 
     if (data.kind === "location") {
-      inspectorTitle.textContent = `${iconForKind[data.kind === "location" ? data.kind : data.kind] || iconForKind[data.kind] || iconForKind[data.id] || "📍"} ${data.name}`;
+      inspectorTitle.textContent = `${iconForKind[data.location_kind] || "📍"} ${data.name}`;
       const dealerStats = data.backlog_units !== undefined ? `
         <div class="inspect-summary">
           <div><span>On hand</span><strong>${data.vehicle_count}</strong></div>
