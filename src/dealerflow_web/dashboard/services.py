@@ -315,7 +315,27 @@ def _shipment_movements(
         eid = event["entity_id"]
         payload = event["payload"] or {}
 
-        if typ in departure_types and event["entity_type"] == "shipment":
+        if typ == "STARTING_PIPELINE_REGISTERED":
+            origin = payload.get("origin", "CHINA_EXPORT_PORT")
+            destination = payload.get("destination", "VANCOUVER")
+            movement = {
+                "id": eid,
+                "entity_type": "shipment",
+                "mode": payload.get("mode", "OCEAN_RORO"),
+                "origin_id": origin,
+                "destination_id": destination,
+                "start_day": float(payload.get("planned_departure_day", -20.0)),
+                "end_day": float(payload.get("expected_arrival_day") or payload.get("planned_arrival_day") or 0),
+                "count": int(payload.get("vin_count", 1)),
+                "configuration_mix": payload.get("configuration_mix", {}),
+                "vins": payload.get("vins", []),
+            }
+            movement["route"] = _route_geometry(
+                movement["mode"], origin, destination, locations
+            )
+            movements.append(movement)
+
+        elif typ in departure_types and event["entity_type"] == "shipment":
             departures[eid] = event
         elif typ in arrival_types and eid in departures:
             departure = departures.pop(eid)
