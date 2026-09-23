@@ -952,6 +952,11 @@ class DealerFlowSimulation:
             "vins": list(shipment.vins),
             "vin_count": len(shipment.vins),
             "configuration_mix": dict(sorted(mix.items())),
+            "vin_configurations": {
+                vin: self.vehicles[vin].configuration_id
+                for vin in shipment.vins
+                if vin in self.vehicles
+            },
             "planned_departure_day": shipment.planned_departure_day,
             "planned_arrival_day": shipment.planned_arrival_day,
         }
