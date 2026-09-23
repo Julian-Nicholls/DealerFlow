@@ -1,6 +1,9 @@
 {% extends "dashboard/base.html" %}{% load static %}
 {% block title %}DealerFlow · Run #{{ run.pk }}{% endblock %}
-{% block extra_head %}<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.css">
+{% endblock %}
 {% block content %}
 <section class="run-header"><div><p class="eyebrow">{{ run.scenario.name }}</p><h1>Run #{{ run.pk }}</h1><p class="mono subtle">seed {{ run.seed }} · {{ run.start_date }} → {{ run.end_date }} · {{ run.event_count }} events</p></div><span class="status status-{{ run.status|lower }}">{{ run.get_status_display }}</span></section>
 {% if run.status == "COMPLETE" %}
@@ -28,4 +31,9 @@
 {% elif run.status == "FAILED" %}<section class="error-card"><h2>Simulation failed</h2><pre>{{ run.error }}</pre></section>
 {% else %}<section class="table-card"><p>Simulation is still running.</p></section>{% endif %}
 {% endblock %}
-{% block extra_scripts %}{% if run.status == "COMPLETE" %}<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script><script src="{% static 'dashboard/replay.js' %}" defer></script>{% endif %}{% endblock %}
+{% block extra_scripts %}{% if run.status == "COMPLETE" %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+<script src="https://unpkg.com/maplibre-gl@5/dist/maplibre-gl.js" defer></script>
+<script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet/leaflet-maplibre-gl.js" defer></script>
+<script src="{% static 'dashboard/replay.js' %}" defer></script>
+{% endif %}{% endblock %}
