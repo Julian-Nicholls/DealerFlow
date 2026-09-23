@@ -27,11 +27,30 @@ def test_baseline_exercises_core_workflows() -> None:
         "VIN_CREATED",
         "VIN_ALLOCATED",
         "VESSEL_ARRIVED",
+        "RAIL_SHIPMENT_DEPARTED",
+        "TRUCK_DEPARTED",
         "VEHICLE_DELIVERED",
     }
     assert expected <= event_types
     assert result.summary["events"] > 0
+    assert result.summary["shipments_created"] > 0
     assert 0 <= result.summary["fill_rate"] <= 1
+
+
+def test_physical_shipments_have_auditable_vin_manifests() -> None:
+    result = run_baseline()
+    departures = [
+        event
+        for event in result.events
+        if event.event_type
+        in {"VESSEL_DEPARTED", "RAIL_SHIPMENT_DEPARTED", "TRUCK_DEPARTED"}
+    ]
+    assert departures
+    for event in departures:
+        assert event.entity_type == "shipment"
+        assert event.payload["vin_count"] == len(event.payload["vins"])
+        assert event.payload["vin_count"] > 0
+        assert sum(event.payload["configuration_mix"].values()) == event.payload["vin_count"]
 
 
 def test_generated_vins_are_unique_and_seventeen_characters() -> None:
