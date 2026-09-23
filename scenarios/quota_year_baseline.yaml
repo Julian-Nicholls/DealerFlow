@@ -34,7 +34,17 @@ logistics:
   port_dwell_days: [2, 5, 12]
   rail_days: [7, 10, 18]
   truck_days: [1, 3, 7]
-  batch_capacity: 600
+  ocean_batch_capacity: 600
+  ocean_min_dispatch: 120
+  ocean_dispatch_interval_days: 7
+  ocean_max_wait_days: 14
+  rail_batch_capacity: 180
+  rail_min_dispatch: 24
+  rail_dispatch_interval_days: 2
+  rail_max_wait_days: 5
+  truck_batch_capacity: 8
+  truck_dispatch_interval_days: 1
+  truck_max_wait_days: 2
 
 dealers:
   - {id: YVR-01, name: Pacific Metro Motors, city: Vancouver, province: "BC", latitude: 49.2827, longitude: -123.1207, demand_scale: 1.20, target_weeks_of_supply: 6}
