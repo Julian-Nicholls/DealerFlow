@@ -16,7 +16,7 @@
 <article><span>External quota</span><strong>{{ run.summary.external_quota_used }}</strong><small>units</small></article>
 </section>
 <section id="replay-root" class="replay-card" data-api-url="{% url 'dashboard:run-replay-api' run.pk %}">
-<div class="replay-toolbar"><div><p class="eyebrow">Network replay</p><h2 id="replay-date">Loading…</h2></div><div class="controls"><button type="button" id="play-button" disabled>Play</button><label>Speed <select id="speed-select" disabled><option value="7">7 days/s</option><option value="30" selected>30 days/s</option><option value="90">90 days/s</option></select></label></div></div>
+<div class="replay-toolbar"><div><p class="eyebrow">Network replay</p><h2 id="replay-date">Loading…</h2></div><div class="controls"><button type="button" id="play-button" disabled>Play</button><label>Speed <select id="speed-select" disabled><option value="1">1 day/s</option><option value="7">7 days/s</option><option value="30" selected>30 days/s</option><option value="90">90 days/s</option></select></label></div></div>
 <input id="day-slider" class="timeline" type="range" min="0" max="365" value="0" step="0.1" disabled>
 <div class="replay-layout"><div id="map" class="map" aria-label="DealerFlow simulation map"></div><aside class="replay-sidebar">
 <div class="live-stat"><span>Simulation day</span><strong id="day-value">0.0</strong></div>
