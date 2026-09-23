@@ -510,8 +510,11 @@ def _state_at_day(run: SimulationRun, day: float) -> dict[str, Any]:
                 "status": "IN_TRANSIT",
                 "configuration_mix": payload.get("configuration_mix", {}),
             }
+            vin_configs = payload.get("vin_configurations", {})
             for vin in vins:
                 item = vehicle(vin)
+                if not item.get("configuration_id"):
+                    item["configuration_id"] = vin_configs.get(vin)
                 item["logistics_status"] = "OCEAN"
                 item["shipment_id"] = shipment_id
                 item["location_id"] = None
@@ -554,8 +557,11 @@ def _state_at_day(run: SimulationRun, day: float) -> dict[str, Any]:
                 "status": "IN_TRANSIT",
                 "configuration_mix": payload.get("configuration_mix", {}),
             }
+            vin_configs = payload.get("vin_configurations", {})
             for vin in vins:
                 item = vehicle(vin)
+                if not item.get("configuration_id"):
+                    item["configuration_id"] = vin_configs.get(vin)
                 item["logistics_status"] = status
                 item["shipment_id"] = shipment_id
                 item["location_id"] = None
