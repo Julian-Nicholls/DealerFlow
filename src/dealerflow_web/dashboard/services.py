@@ -578,9 +578,13 @@ def _state_at_day(run: SimulationRun, day: float) -> dict[str, Any]:
 
         elif typ == "VEHICLE_DELIVERED":
             item = vehicle(eid)
+            dealer_id = payload.get("dealer_id") or event.location_id
+            config_id = payload.get("configuration_id")
             item["logistics_status"] = "DEALER"
-            item["location_id"] = payload.get("dealer_id") or event.location_id
+            item["location_id"] = dealer_id
             item["shipment_id"] = None
+            if dealer_id and config_id and open_orders[dealer_id][config_id] > 0:
+                open_orders[dealer_id][config_id] -= 1
 
         elif typ == "RETAIL_SALE_COMPLETED":
             item = vehicle(eid)
@@ -593,12 +597,6 @@ def _state_at_day(run: SimulationRun, day: float) -> dict[str, Any]:
             config_id = payload.get("configuration_id")
             if dealer_id and config_id:
                 open_orders[dealer_id][config_id] += int(payload.get("quantity", 0))
-
-        elif typ == "VEHICLE_DELIVERED":
-            dealer_id = payload.get("dealer_id") or event.location_id
-            config_id = payload.get("configuration_id")
-            if dealer_id and config_id and open_orders[dealer_id][config_id] > 0:
-                open_orders[dealer_id][config_id] -= 1
 
         if typ == "BACKLOG_CREATED":
             config_id = payload.get("configuration_id")
